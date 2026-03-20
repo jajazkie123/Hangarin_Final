@@ -1,0 +1,130 @@
+{% extends 'tasks/base.html' %}
+{% block title %}{{ task.title }}{% endblock %}
+{% block page_title %}Task Detail{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'task_list' %}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left"></i> Back</a>
+<a href="{% url 'task_edit' task.pk %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-pen"></i> Edit</a>
+<a href="{% url 'task_delete' task.pk %}" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</a>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+
+    <!-- Task info - full width on top -->
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="fw-bold mb-0">{{ task.title }}</h5>
+                    {% if task.status == 'Completed' %}<span class="badge bg-success">Completed</span>
+                    {% elif task.status == 'In Progress' %}<span class="badge" style="background-color:#1a6b5a;">In Progress</span>
+                    {% else %}<span class="badge bg-warning text-dark">Pending</span>{% endif %}
+                </div>
+                {% if task.description %}
+                <p class="text-muted mb-3" style="font-size:14px;">{{ task.description }}</p>
+                {% endif %}
+                <hr class="my-2">
+                <div class="row g-2">
+                    <div class="col-6 col-md-3">
+                        <small class="text-uppercase text-muted d-block" style="font-size:11px; letter-spacing:0.5px;">Priority</small>
+                        {% if task.priority %}<span class="badge bg-secondary">{{ task.priority.name }}</span>
+                        {% else %}<span class="text-muted" style="font-size:13px;">—</span>{% endif %}
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <small class="text-uppercase text-muted d-block" style="font-size:11px; letter-spacing:0.5px;">Category</small>
+                        {% if task.category %}<span class="badge bg-light text-dark border">{{ task.category.name }}</span>
+                        {% else %}<span class="text-muted" style="font-size:13px;">—</span>{% endif %}
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <small class="text-uppercase text-muted d-block" style="font-size:11px; letter-spacing:0.5px;">Deadline</small>
+                        <span style="font-size:13px;">{% if task.deadline %}{{ task.deadline|date:"M d, Y H:i" }}{% else %}—{% endif %}</span>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <small class="text-uppercase text-muted d-block" style="font-size:11px; letter-spacing:0.5px;">Created</small>
+                        <span style="font-size:13px;">{{ task.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subtasks -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-bottom">
+                <span class="fw-semibold" style="font-size:14px;"><i class="fa-solid fa-list-check text-success me-1"></i> Subtasks <span class="badge bg-secondary ms-1">{{ subtasks.count }}</span></span>
+            </div>
+            <div class="card-body">
+                {% if subtasks %}
+                    {% for subtask in subtasks %}
+                    <div class="d-flex align-items-center gap-2 mb-2 p-2 border rounded {% if subtask.status == 'Completed' %}bg-light opacity-50{% endif %}">
+                        <a href="{% url 'subtask_toggle' subtask.pk %}" class="text-decoration-none">
+                            <input type="checkbox" {% if subtask.status == 'Completed' %}checked{% endif %} onclick="return false;" class="form-check-input">
+                        </a>
+                        <span class="flex-grow-1" style="font-size:13px;{% if subtask.status == 'Completed' %}text-decoration:line-through;{% endif %}">{{ subtask.title }}</span>
+                        {% if subtask.status == 'Completed' %}<span class="badge bg-success" style="font-size:10px;">Done</span>
+                        {% elif subtask.status == 'In Progress' %}<span class="badge" style="background-color:#1a6b5a;font-size:10px;">Active</span>
+                        {% else %}<span class="badge bg-warning text-dark" style="font-size:10px;">Pending</span>{% endif %}
+                        <form method="post" action="{% url 'subtask_delete' subtask.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm py-0 px-1" onclick="return confirm('Delete this subtask?')">
+                                <i class="fa-solid fa-xmark" style="font-size:11px;"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center py-3" style="font-size:13px;">No subtasks yet.</p>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-white border-top">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in subtask_form %}
+                    <div class="mb-2">{{ field }}</div>
+                    {% endfor %}
+                    <button type="submit" name="add_subtask" class="btn btn-sm btn-primary w-100"><i class="fa-solid fa-plus"></i> Add Subtask</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-bottom">
+                <span class="fw-semibold" style="font-size:14px;"><i class="fa-solid fa-note-sticky text-warning me-1"></i> Notes <span class="badge bg-secondary ms-1">{{ notes.count }}</span></span>
+            </div>
+            <div class="card-body">
+                {% if notes %}
+                    {% for note in notes %}
+                    <div class="position-relative mb-2 p-2 border rounded" style="background:#fffdf5; border-left: 3px solid #ffc107 !important;">
+                        <p style="font-size:13px; color:#555; margin-bottom:4px;">{{ note.content }}</p>
+                        <small class="text-muted">{{ note.created_at|date:"M d, Y H:i" }}</small>
+                        <form method="post" action="{% url 'note_delete' note.pk %}" style="position:absolute;top:6px;right:6px;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm py-0 px-1" onclick="return confirm('Delete this note?')">
+                                <i class="fa-solid fa-xmark" style="font-size:11px;"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center py-3" style="font-size:13px;">No notes yet.</p>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-white border-top">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in note_form %}
+                    <div class="mb-2">{{ field }}</div>
+                    {% endfor %}
+                    <button type="submit" name="add_note" class="btn btn-sm btn-primary"><i class="fa-solid fa-plus"></i> Add Note</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'tasks/base.html' %}
+{% block title %}Delete Category{% endblock %}
+{% block page_title %}Delete Category{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'category_list' %}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left"></i> Back</a>
+{% endblock %}
+{% block content %}
+<div style="max-width: 440px;">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-4">
+            <i class="fa-solid fa-triangle-exclamation text-danger fa-2x mb-3"></i>
+            <h5 class="fw-bold mb-2">Delete this category?</h5>
+            <div class="alert alert-secondary py-2 px-3 d-inline-block mb-4" style="font-size:13px;">"{{ category.name }}"</div>
+            <form method="post" class="d-flex gap-2 justify-content-center">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Yes, Delete</button>
+                <a href="{% url 'category_list' %}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

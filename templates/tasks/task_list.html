@@ -1,0 +1,126 @@
+{% extends 'tasks/base.html' %}
+{% block title %}Tasks{% endblock %}
+{% block page_title %}My Tasks{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'task_create' %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> New Task</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-auto">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search tasks..." class="form-control form-control-sm" style="width:200px;">
+            </div>
+            <div class="col-auto">
+                <select name="status" class="form-select form-select-sm" style="width:130px;">
+                    <option value="">All Status</option>
+                    <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="In Progress" {% if status_filter == 'In Progress' %}selected{% endif %}>In Progress</option>
+                    <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <select name="category" class="form-select form-select-sm" style="width:140px;">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.pk }}" {% if category_filter == cat.pk|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <select name="priority" class="form-select form-select-sm" style="width:140px;">
+                    <option value="">All Priorities</option>
+                    {% for p in priorities %}
+                    <option value="{{ p.pk }}" {% if priority_filter == p.pk|stringformat:"s" %}selected{% endif %}>{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
+                {% if query or status_filter or category_filter or priority_filter %}
+                <a href="{% url 'task_list' %}" class="btn btn-outline-secondary btn-sm">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
+        <span class="fw-semibold">All Tasks</span>
+        <small class="text-muted">{{ page_obj.paginator.count }} result{% if page_obj.paginator.count != 1 %}s{% endif %}</small>
+    </div>
+
+    {% if page_obj.object_list %}
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th><a href="?q={{ query }}&status={{ status_filter }}&category={{ category_filter }}&priority={{ priority_filter }}&sort={% if sort_by == 'title' %}-title{% else %}title{% endif %}" class="text-decoration-none text-dark">Title {% if sort_by == 'title' %}▲{% elif sort_by == '-title' %}▼{% endif %}</a></th>
+                    <th><a href="?q={{ query }}&status={{ status_filter }}&category={{ category_filter }}&priority={{ priority_filter }}&sort={% if sort_by == 'status' %}-status{% else %}status{% endif %}" class="text-decoration-none text-dark">Status {% if sort_by == 'status' %}▲{% elif sort_by == '-status' %}▼{% endif %}</a></th>
+                    <th>Priority</th>
+                    <th>Category</th>
+                    <th><a href="?q={{ query }}&status={{ status_filter }}&category={{ category_filter }}&priority={{ priority_filter }}&sort={% if sort_by == 'deadline' %}-deadline{% else %}deadline{% endif %}" class="text-decoration-none text-dark">Deadline {% if sort_by == 'deadline' %}▲{% elif sort_by == '-deadline' %}▼{% endif %}</a></th>
+                    <th><a href="?q={{ query }}&status={{ status_filter }}&category={{ category_filter }}&priority={{ priority_filter }}&sort={% if sort_by == 'created_at' %}-created_at{% else %}created_at{% endif %}" class="text-decoration-none text-dark">Created {% if sort_by == 'created_at' %}▲{% elif sort_by == '-created_at' %}▼{% endif %}</a></th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in page_obj %}
+                <tr>
+                    <td>
+                        <a href="{% url 'task_detail' task.pk %}" class="text-decoration-none fw-medium" style="color:#1a6b5a;">{{ task.title|truncatechars:42 }}</a>
+                        {% if task.subtasks.count > 0 %}
+                        <br><small class="text-muted"><i class="fa-solid fa-sitemap"></i> {{ task.subtasks.count }} subtask{{ task.subtasks.count|pluralize }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if task.status == 'Completed' %}<span class="badge bg-success">Completed</span>
+                        {% elif task.status == 'In Progress' %}<span class="badge" style="background-color:#1a6b5a;">In Progress</span>
+                        {% else %}<span class="badge bg-warning text-dark">Pending</span>{% endif %}
+                    </td>
+                    <td>{% if task.priority %}<span class="badge bg-secondary">{{ task.priority.name }}</span>{% else %}<span class="text-muted">—</span>{% endif %}</td>
+                    <td>{% if task.category %}<span class="badge bg-light text-dark border">{{ task.category.name }}</span>{% else %}<span class="text-muted">—</span>{% endif %}</td>
+                    <td class="text-muted" style="font-size:13px;">{% if task.deadline %}{{ task.deadline|date:"M d, Y" }}{% else %}—{% endif %}</td>
+                    <td class="text-muted" style="font-size:13px;">{{ task.created_at|date:"M d, Y" }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'task_detail' task.pk %}" class="btn btn-outline-secondary btn-sm" title="View"><i class="fa-solid fa-eye"></i></a>
+                        <a href="{% url 'task_edit' task.pk %}" class="btn btn-outline-primary btn-sm" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                        <a href="{% url 'task_delete' task.pk %}" class="btn btn-outline-danger btn-sm" title="Delete"><i class="fa-solid fa-trash"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="card-footer bg-white d-flex justify-content-center border-top">
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ query }}&status={{ status_filter }}&category={{ category_filter }}&priority={{ priority_filter }}&sort={{ sort_by }}">&laquo;</a></li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}<li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}<li class="page-item"><a class="page-link" href="?page={{ num }}&q={{ query }}&status={{ status_filter }}&category={{ category_filter }}&priority={{ priority_filter }}&sort={{ sort_by }}">{{ num }}</a></li>{% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ query }}&status={{ status_filter }}&category={{ category_filter }}&priority={{ priority_filter }}&sort={{ sort_by }}">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="card-body text-center py-5 text-muted">
+        <i class="fa-solid fa-magnifying-glass fa-2x mb-3 d-block opacity-25"></i>
+        <p>{% if query %}No results found. {% endif %}<a href="{% url 'task_create' %}" style="color:#1a6b5a;">Create a new task</a></p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
