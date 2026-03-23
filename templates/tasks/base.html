@@ -72,6 +72,9 @@
             border: 1px solid rgba(255,255,255,0.25);
             border-radius: 4px;
             transition: all 0.15s;
+            background: transparent;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
         }
         .top-navbar .logout-btn:hover {
             background: rgba(255,255,255,0.12);
@@ -139,7 +142,12 @@
     <div class="user-area">
         {% if user.is_authenticated %}
         <span><i class="fa-regular fa-user" style="margin-right:4px;"></i>{{ user.username }}</span>
-        <a href="{% url 'logout' %}" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        <form method="post" action="{% url 'logout' %}" style="margin:0;padding:0;">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+        </form>
         {% endif %}
     </div>
 </div>

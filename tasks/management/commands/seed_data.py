@@ -51,7 +51,7 @@ class Command(BaseCommand):
                 status=fake.random_element(elements=["Pending", "In Progress", "Completed"]),
                 category=fake.random_element(elements=categories),
                 priority=fake.random_element(elements=priorities),
-                user=fake.random_element(elements=[demo_user, admin_user]),
+                user=fake.random_element(elements=list(User.objects.all())),
             )
 
             # SubTasks
