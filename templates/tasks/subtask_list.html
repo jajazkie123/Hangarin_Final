@@ -1,0 +1,93 @@
+{% extends 'tasks/base.html' %}
+{% block title %}Sub Tasks{% endblock %}
+{% block page_title %}Sub Tasks{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="p-3 border-bottom d-flex gap-2 align-items-center">
+            <form method="get" class="d-flex gap-2 align-items-center flex-wrap">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search subtasks..." class="form-control form-control-sm" style="width:220px;">
+                <select name="status" class="form-select form-select-sm" style="width:150px;" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="In Progress" {% if status_filter == 'In Progress' %}selected{% endif %}>In Progress</option>
+                    <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
+                </select>
+                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                {% if query or status_filter %}
+                <a href="{% url 'subtask_list' %}" class="btn btn-outline-secondary btn-sm">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        {% if page_obj.object_list %}
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Parent Task</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subtask in page_obj %}
+                <tr>
+                    <td>{{ subtask.title }}</td>
+                    <td>
+                        {% if subtask.status == 'Completed' %}
+                            <span class="badge bg-success">Completed</span>
+                        {% elif subtask.status == 'In Progress' %}
+                            <span class="badge bg-primary">In Progress</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'task_detail' subtask.parent_task.pk %}">{{ subtask.parent_task.title }}</a>
+                    </td>
+                    <td style="font-size:13px; color:#6c757d;">{{ subtask.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <form method="post" action="{% url 'subtask_delete' subtask.pk %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this subtask?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if page_obj.has_other_pages %}
+        <div class="d-flex justify-content-center p-3">
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ query }}&status={{ status_filter }}">«</a></li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}&q={{ query }}&status={{ status_filter }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ query }}&status={{ status_filter }}">»</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="fa-solid fa-list fa-2x mb-3 opacity-25"></i>
+            <p>No subtasks found.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

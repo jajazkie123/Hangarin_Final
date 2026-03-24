@@ -311,3 +311,56 @@ def priority_delete(request, pk):
         messages.success(request, 'Priority deleted.')
         return redirect('priority_list')
     return render(request, 'tasks/priority_confirm_delete.html', {'priority': priority, 'active_page': 'priorities'})
+
+@login_required
+def subtask_list(request):
+    subtasks = SubTask.objects.filter(parent_task__user=request.user)
+
+    # Search
+    query = request.GET.get('q', '')
+    if query:
+        subtasks = subtasks.filter(title__icontains=query)
+
+    # Filter by status
+    status_filter = request.GET.get('status', '')
+    if status_filter:
+        subtasks = subtasks.filter(status=status_filter)
+
+    # Pagination
+    paginator = Paginator(subtasks, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'tasks/subtask_list.html', {
+        'page_obj': page_obj,
+        'query': query,
+        'status_filter': status_filter,
+        'active_page': 'subtasks',
+    })
+
+
+@login_required
+def note_list(request):
+    notes = Note.objects.filter(task__user=request.user).order_by('-created_at')
+
+    # Search
+    query = request.GET.get('q', '')
+    if query:
+        notes = notes.filter(content__icontains=query)
+
+    # Sorting
+    sort_by = request.GET.get('sort', '-created_at')
+    if sort_by == 'oldest':
+        notes = notes.order_by('created_at')
+    else:
+        notes = notes.order_by('-created_at')
+
+    # Pagination
+    paginator = Paginator(notes, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'tasks/note_list.html', {
+        'page_obj': page_obj,
+        'query': query,
+        'sort_by': sort_by,
+        'active_page': 'notes',
+    })

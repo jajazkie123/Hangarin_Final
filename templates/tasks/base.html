@@ -127,6 +127,12 @@
         <a href="{% url 'task_list' %}" class="nav-item {% if active_page == 'tasks' %}active{% endif %}">
             <i class="fa-solid fa-list-check"></i> Tasks
         </a>
+        <a href="{% url 'subtask_list' %}" class="nav-item {% if active_page == 'subtasks' %}active{% endif %}">
+            <i class="fa-solid fa-sitemap"></i> Sub Tasks
+        </a>
+        <a href="{% url 'note_list' %}" class="nav-item {% if active_page == 'notes' %}active{% endif %}">
+            <i class="fa-solid fa-note-sticky"></i> Notes
+        </a>
         <a href="{% url 'category_list' %}" class="nav-item {% if active_page == 'categories' %}active{% endif %}">
             <i class="fa-solid fa-folder"></i> Categories
         </a>

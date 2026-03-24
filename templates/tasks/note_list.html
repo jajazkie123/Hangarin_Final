@@ -1,0 +1,81 @@
+{% extends 'tasks/base.html' %}
+{% block title %}Notes{% endblock %}
+{% block page_title %}Notes{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="p-3 border-bottom d-flex gap-2 align-items-center">
+            <form method="get" class="d-flex gap-2 align-items-center flex-wrap">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search notes..." class="form-control form-control-sm" style="width:220px;">
+                <select name="sort" class="form-select form-select-sm" style="width:160px;" onchange="this.form.submit()">
+                    <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest First</option>
+                </select>
+                <button type="submit" class="btn btn-primary btn-sm">Search</button>
+                {% if query %}
+                <a href="{% url 'note_list' %}" class="btn btn-outline-secondary btn-sm">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        {% if page_obj.object_list %}
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Content</th>
+                    <th>Task</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for note in page_obj %}
+                <tr>
+                    <td style="max-width:400px;">{{ note.content|truncatechars:80 }}</td>
+                    <td>
+                        <a href="{% url 'task_detail' note.task.pk %}">{{ note.task.title }}</a>
+                    </td>
+                    <td style="font-size:13px; color:#6c757d;">{{ note.created_at|date:"M d, Y · h:i A" }}</td>
+                    <td>
+                        <form method="post" action="{% url 'note_delete' note.pk %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this note?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if page_obj.has_other_pages %}
+        <div class="d-flex justify-content-center p-3">
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ query }}&sort={{ sort_by }}">«</a></li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}&q={{ query }}&sort={{ sort_by }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ query }}&sort={{ sort_by }}">»</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="fa-solid fa-note-sticky fa-2x mb-3 opacity-25"></i>
+            <p>No notes found.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

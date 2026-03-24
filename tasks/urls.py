@@ -19,4 +19,6 @@ urlpatterns = [
     path('priorities/create/', views.priority_create, name='priority_create'),
     path('priorities/<int:pk>/edit/', views.priority_edit, name='priority_edit'),
     path('priorities/<int:pk>/delete/', views.priority_delete, name='priority_delete'),
+    path('subtasks/', views.subtask_list, name='subtask_list'),
+    path('notes/', views.note_list, name='note_list'),
 ]
