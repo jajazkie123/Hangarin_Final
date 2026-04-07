@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+os.environ.setdefault('OPENWEATHER_API_KEY', '52f6c8bc620171b0f8d699807faa0c76')
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-hangarin-todo-midterm-secret-key-2024'
