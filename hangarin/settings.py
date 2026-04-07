@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-os.environ.setdefault('OPENWEATHER_API_KEY', '52f6c8bc620171b0f8d699807faa0c76')
+OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
