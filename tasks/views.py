@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -6,11 +7,11 @@ from django.db.models import Q, Count
 from django.utils import timezone
 from .models import Task, SubTask, Note, Category, Priority
 from .forms import TaskForm, SubTaskForm, NoteForm, CategoryForm, PriorityForm
+import requests
 
 
 @login_required
 def dashboard(request):
-    # In dashboard view
     user_tasks = Task.objects.all() if request.user.is_superuser else Task.objects.filter(user=request.user)
     total_tasks = user_tasks.count()
     completed_tasks = user_tasks.filter(status='Completed').count()
@@ -18,11 +19,31 @@ def dashboard(request):
     in_progress_tasks = user_tasks.filter(status='In Progress').count()
     current_year = timezone.now().year
     tasks_this_year = user_tasks.filter(created_at__year=current_year).count()
-
     recent_tasks = user_tasks.order_by('-created_at')[:5]
     overdue_tasks = user_tasks.filter(
         deadline__lt=timezone.now()
     ).exclude(status='Completed').count()
+
+    # --- Weather ---
+    weather_data = None
+    city = request.GET.get('city', 'Puerto Princesa')
+    api_key = os.getenv('OPENWEATHER_API_KEY')
+    try:
+        url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        weather_data = {
+            'city': data['name'],
+            'country': data['sys']['country'],
+            'temp': data['main']['temp'],
+            'feels_like': data['main']['feels_like'],
+            'humidity': data['main']['humidity'],
+            'description': data['weather'][0]['description'].title(),
+            'icon': data['weather'][0]['icon'],
+        }
+    except Exception as e:
+        weather_data = {'error': 'Could not fetch weather data.'}
 
     context = {
         'total_tasks': total_tasks,
@@ -32,6 +53,8 @@ def dashboard(request):
         'tasks_this_year': tasks_this_year,
         'recent_tasks': recent_tasks,
         'overdue_tasks': overdue_tasks,
+        'weather': weather_data,
+        'city': city,
         'active_page': 'dashboard',
     }
     return render(request, 'tasks/dashboard.html', context)

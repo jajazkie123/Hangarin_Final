@@ -1,0 +1,5 @@
+.env
+db.sqlite3
+hangarinvenv/
+__pycache__/
+*.pyc
