@@ -18,7 +18,6 @@
             min-height: 100vh;
         }
 
-        /* ── TOP NAVBAR ── */
         .top-navbar {
             background-color: #1a6b5a;
             padding: 0 16px;
@@ -41,7 +40,6 @@
         }
         .top-navbar .brand:hover { color: #d4f0ea; }
 
-        /* Desktop nav links */
         .desktop-nav {
             display: flex;
             align-items: center;
@@ -81,7 +79,6 @@
         }
         .logout-btn:hover { background: rgba(255,255,255,0.12); color: white; }
 
-        /* Hamburger button */
         .hamburger-btn {
             background: none;
             border: none;
@@ -92,7 +89,6 @@
             display: none;
         }
 
-        /* Mobile drawer */
         .mobile-drawer {
             display: none;
             position: fixed;
@@ -134,7 +130,6 @@
             padding: 8px 16px;
         }
 
-        /* Show/hide based on screen */
         @media (max-width: 768px) {
             .desktop-nav { display: none; }
             .desktop-user { display: none; }
@@ -145,7 +140,6 @@
             .mobile-drawer { display: none !important; }
         }
 
-        /* ── SUBBAR ── */
         .subbar {
             background-color: white;
             border-bottom: 1px solid #dee2e6;
@@ -156,13 +150,11 @@
         }
         .subbar h5 { margin: 0; font-size: 16px; font-weight: 600; color: #212529; }
 
-        /* ── CONTENT ── */
         .content-area {
             padding: 20px 16px;
             max-width: 1200px;
         }
 
-        /* ── BOOTSTRAP OVERRIDES ── */
         .btn-primary { background-color: #1a6b5a; border-color: #1a6b5a; }
         .btn-primary:hover, .btn-primary:focus { background-color: #155748; border-color: #155748; }
         .btn-outline-primary { color: #1a6b5a; border-color: #1a6b5a; }
@@ -178,13 +170,11 @@
 </head>
 <body>
 
-<!-- TOP NAVBAR -->
 <div class="top-navbar">
     <a href="{% url 'dashboard' %}" class="brand">
         <i class="fa-solid fa-check-double"></i> Hangarin
     </a>
 
-    <!-- Desktop nav -->
     <nav class="desktop-nav">
         <a href="{% url 'dashboard' %}" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">
             <i class="fa-solid fa-house"></i> Dashboard
@@ -209,7 +199,6 @@
         {% endif %}
     </nav>
 
-    <!-- Desktop user/logout -->
     <div class="user-area desktop-user">
         {% if user.is_authenticated %}
         <span><i class="fa-regular fa-user" style="margin-right:4px;"></i>{{ user.username }}</span>
@@ -222,13 +211,11 @@
         {% endif %}
     </div>
 
-    <!-- Hamburger (mobile only) -->
     <button class="hamburger-btn" onclick="toggleDrawer()">
         <i class="fa-solid fa-bars" id="hamburger-icon"></i>
     </button>
 </div>
 
-<!-- MOBILE DRAWER -->
 <div class="mobile-drawer" id="mobileDrawer">
     {% if user.is_authenticated %}
     <div class="user-info"><i class="fa-regular fa-user" style="margin-right:6px;"></i>{{ user.username }}</div>
@@ -266,13 +253,11 @@
     {% endif %}
 </div>
 
-<!-- SUBBAR -->
 <div class="subbar">
     <h5>{% block page_title %}Dashboard{% endblock %}</h5>
     <div>{% block topbar_actions %}{% endblock %}</div>
 </div>
 
-<!-- CONTENT -->
 <div class="content-area">
     {% if messages %}
         {% for message in messages %}
@@ -297,7 +282,6 @@
             icon.className = 'fa-solid fa-bars';
         }
     }
-    // Close drawer when a nav link is clicked
     document.querySelectorAll('.mobile-drawer .nav-item').forEach(item => {
         item.addEventListener('click', () => {
             document.getElementById('mobileDrawer').classList.remove('open');
