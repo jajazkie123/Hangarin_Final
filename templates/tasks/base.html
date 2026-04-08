@@ -205,12 +205,9 @@
     <div class="user-area desktop-user">
         {% if user.is_authenticated %}
         <span><i class="fa-regular fa-user" style="margin-right:4px;"></i>{{ user.username }}</span>
-        <form method="post" action="{% url 'logout' %}" style="margin:0;padding:0;">
-            {% csrf_token %}
-            <button type="submit" class="logout-btn">
-                <i class="fa-solid fa-right-from-bracket"></i> Logout
-            </button>
-        </form>
+        <a href="{% url 'logout' %}" class="logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
         {% endif %}
     </div>
 
@@ -247,12 +244,9 @@
     {% endif %}
     <div class="divider"></div>
     {% if user.is_authenticated %}
-    <form method="post" action="{% url 'logout' %}" style="margin:0;padding:0;">
-        {% csrf_token %}
-        <button type="submit" class="nav-item" style="width:100%;background:none;border:none;text-align:left;cursor:pointer;color:rgba(255,255,255,0.85);">
-            <i class="fa-solid fa-right-from-bracket"></i> Logout
-        </button>
-    </form>
+    <a href="{% url 'logout' %}" class="nav-item">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </a>
     {% endif %}
 </div>
 
