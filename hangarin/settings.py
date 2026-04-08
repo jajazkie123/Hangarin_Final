@@ -21,11 +21,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'django.contrib.sites', 
-
-    'allauth', 
-    'allauth.account', 
-    'allauth.socialaccount', 
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'tasks',
     'pwa',
@@ -106,9 +105,8 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/login/'
 ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_LOGOUT_REDIRECT_URL = '/login/'
 
 PWA_APP_NAME = 'Hangarin'
 PWA_APP_DESCRIPTION = "Hangarin - Your Personal To-Do Manager"
@@ -122,41 +120,32 @@ PWA_APP_STATUS_BAR_COLOR = 'default'
 PWA_APP_ICONS = [
     {
         'src': '/static/img/icon-192.png',
-        'sizes': '192x192'
+        'sizes': '192x192',
+        'type': 'image/png'
     },
     {
         'src': '/static/img/icon-512.png',
-        'sizes': '512x512'
+        'sizes': '512x512',
+        'type': 'image/png'
     }
 ]
 PWA_APP_ICONS_APPLE = [
     {
         'src': '/static/img/icon-192.png',
-        'sizes': '192x192'
+        'sizes': '192x192',
+        'type': 'image/png'
     },
     {
         'src': '/static/img/icon-512.png',
-        'sizes': '512x512'
+        'sizes': '512x512',
+        'type': 'image/png'
     }
 ]
 PWA_APP_DIR = 'ltr'
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
-
-
 
 CSRF_TRUSTED_ORIGINS = [
     'https://jajazkie123.pythonanywhere.com',
     'http://127.0.0.1:8000',
     'http://localhost:8000',
 ]
-
-CSRF_USE_SESSIONS = True
-
-SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SAMESITE = 'Lax'
-
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-
-ACCOUNT_LOGOUT_ON_GET = True
-ACCOUNT_LOGOUT_REDIRECT_URL = '/login/'
